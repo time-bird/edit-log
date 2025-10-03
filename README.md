@@ -1,6 +1,6 @@
 # editlog README
 
-This is the README for your extension "editlog". After writing up a brief description, we recommend including the following sections.
+This is the README for your extension "edit-log". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 
