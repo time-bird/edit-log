@@ -12,11 +12,28 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
-    "views": {
-      "explorer": [
+    "viewsContainers": {
+      "activitybar": [
         {
           "id": "edit-log",
-          "name": "EditLog"
+          "title": "EditLog",
+          "icon": "media/dep.svg"
+        }
+      ]
+    },
+    "views": {
+      "edit-log": [
+        {
+          "id": "edit-log-views",
+          "name": "Views",
+          "icon": "media/dep.svg",
+          "contextualTitle": "Package Explorer"
+        },
+        {
+          "id": "edit-log-logs",
+          "name": "Custom Logs",
+          "icon": "media/log.svg",
+          "contextualTitle": "Package Explorer"
         }
       ]
     },

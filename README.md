@@ -1,6 +1,7 @@
 # editlog README
 
 This is the README for your extension "edit-log". After writing up a brief description, we recommend including the following sections.
+とりあえず文字を追加してみる。
 
 ## Features
 
