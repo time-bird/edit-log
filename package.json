@@ -1,75 +1,32 @@
 {
   "name": "edit-log",
   "displayName": "EditLog",
-  "description": "",
+  "description": "Track character additions and removals per day.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.104.0"
   },
-  "categories": [
-    "Other"
+  "categories": ["Other"],
+  "activationEvents": [
+    "onView:edit-log"
   ],
-  "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "views": {
       "explorer": [
         {
+          "type": "webview",
           "id": "edit-log",
           "name": "EditLog"
         }
       ]
     },
     "commands": [
-    {
-      "command": "nodeDependencies.refreshEntry",
-      "title": "Refresh",
-      "icon": {
-        "light": "resources/light/refresh.svg",
-        "dark": "resources/dark/refresh.svg"
-      }
-    },
-    {
-      "command": "nodeDependencies.addEntry",
-      "title": "Add"
-    },
-    {
-      "command": "nodeDependencies.editEntry",
-      "title": "Edit",
-      "icon": {
-        "light": "resources/light/edit.svg",
-        "dark": "resources/dark/edit.svg"
-      }
-    },
-    {
-      "command": "nodeDependencies.deleteEntry",
-      "title": "Delete"
-    }
-  ],
-    "menus": {
-    "view/title": [
       {
-        "command": "nodeDependencies.refreshEntry",
-        "when": "view == nodeDependencies",
-        "group": "navigation"
-      },
-      {
-        "command": "nodeDependencies.addEntry",
-        "when": "view == nodeDependencies"
-      }
-    ],
-    "view/item/context": [
-      {
-        "command": "nodeDependencies.editEntry",
-        "when": "view == nodeDependencies && viewItem == dependency",
-        "group": "inline"
-      },
-      {
-        "command": "nodeDependencies.deleteEntry",
-        "when": "view == nodeDependencies && viewItem == dependency"
+        "command": "edit-log.refresh",
+        "title": "Refresh Edit Log"
       }
     ]
-  }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
