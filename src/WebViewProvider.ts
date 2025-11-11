@@ -1,158 +1,157 @@
 import * as vscode from 'vscode';
 
-// 1日分の編集履歴
 export interface FileHistory {
-  date: string;        // YYYY-MM-DD
-  addedCount: number;  // 追加文字数
-  removedCount: number;// 削除文字数
-  charCount: number;   // その日の最終文字数
-}
-
-// 空白・改行・タブを除いた文字数をカウント
-export function countChars(text: string): number {
-  return Array.from(text).filter(ch => !/\s/.test(ch)).length;
+  date: string;        
+  addedCount: number;  
+  removedCount: number;
+  charCount: number;   
 }
 
 export class WebViewProvider implements vscode.WebviewViewProvider {
-  private _view?: vscode.WebviewView;
-  private activeFile: string | undefined;
-  private fileStats: { [filePath: string]: { history: FileHistory[] } } = {};
+  private view?: vscode.WebviewView;
+  private activeFilePath?: string;
+  private previousContent: string = '';
+  private historyMap: Map<string, FileHistory[]> = new Map();
 
-  private updateTimeout?: NodeJS.Timeout;
-  private readonly UPDATE_INTERVAL = 800; // 確定後に更新する間隔(ms)
-
-  constructor(private readonly context: vscode.ExtensionContext) {
-    const stored = this.context.globalState.get<{ [filePath: string]: { history: FileHistory[] } }>('fileStats');
-    if (stored) this.fileStats = stored;
-
-    // アクティブエディタ変更時に自動で更新
-    vscode.window.onDidChangeActiveTextEditor(() => {
-      this.activeFile = vscode.window.activeTextEditor?.document.uri.fsPath;
-      this.updateActiveFileStats();
-      this.update();
-    });
-
-    // 編集イベント
-    vscode.workspace.onDidChangeTextDocument(event => {
-      if (this.activeFile && event.document.uri.fsPath === this.activeFile) {
-        this.scheduleUpdate();
+  constructor(private context: vscode.ExtensionContext) {
+    // 保存時に更新
+    vscode.workspace.onDidSaveTextDocument(doc => {
+      if (doc.uri.fsPath === this.activeFilePath) {
+        this.updateHistory(doc.getText());
       }
     });
+
+    // ファイル移動・名前変更
+    vscode.workspace.onDidRenameFiles(e => {
+      e.files.forEach(f => {
+        const oldPath = f.oldUri.fsPath;
+        const newPath = f.newUri.fsPath;
+        if (this.historyMap.has(oldPath)) {
+          const history = this.historyMap.get(oldPath)!;
+          this.historyMap.set(newPath, history);
+          this.historyMap.delete(oldPath);
+
+          if (this.activeFilePath === oldPath) {
+            this.activeFilePath = newPath;
+            const doc = vscode.workspace.textDocuments.find(d => d.uri.fsPath === newPath);
+            this.previousContent = doc ? doc.getText() : '';
+            this.updateWebview();
+          }
+        }
+      });
+    });
   }
 
-  public resolveWebviewView(webviewView: vscode.WebviewView) {
-    this._view = webviewView;
+  resolveWebviewView(webviewView: vscode.WebviewView) {
+    this.view = webviewView;
     webviewView.webview.options = { enableScripts: true };
-    this.update();
+    this.updateWebview();
   }
 
-  setActiveFile(filePath: string) {
-    this.activeFile = filePath;
-    this.updateActiveFileStats();
-    this.update();
+  private segmenter = new Intl.Segmenter('ja', { granularity: 'grapheme' });
+
+  private countEffectiveChars(text: string): number {
+    const segments = [...this.segmenter.segment(text)];
+    return segments.filter(seg => !/[\s\t\n\r]/.test(seg.segment)).length;
   }
 
-  private updateActiveFileStats() {
-    if (!this.activeFile) return;
-    const today = new Date().toISOString().split('T')[0];
-    const text = vscode.window.activeTextEditor?.document.getText() || '';
-    const charCount = countChars(text);
+  public setActiveFile(filePath: string) {
+    this.activeFilePath = filePath;
+    const doc = vscode.workspace.textDocuments.find(d => d.uri.fsPath === filePath);
+    this.previousContent = doc ? doc.getText() : '';
 
-    if (!this.fileStats[this.activeFile]) this.fileStats[this.activeFile] = { history: [] };
+    const date = new Date().toLocaleDateString('ja-JP', {
+      year: '2-digit',
+      month: '2-digit',
+      day: '2-digit'
+    }).replace(/\//g, '-');
 
-    let todayLog = this.fileStats[this.activeFile].history.find(h => h.date === today);
-    if (!todayLog) {
-      todayLog = { date: today, addedCount: 0, removedCount: 0, charCount };
-      this.fileStats[this.activeFile].history.push(todayLog);
+    // 当日履歴を取得
+    const history = this.historyMap.get(filePath) || [];
+    const today = history.find(h => h.date === date);
+    if (!today) {
+      // 今日の履歴がまだなければ新規作成
+      history.push({
+        date,
+        addedCount: 0,
+        removedCount: 0,
+        charCount: this.countEffectiveChars(this.previousContent)
+      });
+      this.historyMap.set(filePath, history);
+    }
+
+    this.updateWebview();
+  }
+
+  private updateHistory(newContent: string) {
+    if (!this.activeFilePath) return;
+
+    const date = new Date().toLocaleDateString('ja-JP', {
+      year: '2-digit',
+      month: '2-digit',
+      day: '2-digit'
+    }).replace(/\//g, '-');
+
+    const effectiveChars = this.countEffectiveChars(newContent);
+
+    const history = this.historyMap.get(this.activeFilePath) || [];
+    let today = history.find(h => h.date === date);
+
+    if (today) {
+      // 前回の履歴から現在文字数との差を計算して加算/減算
+      const prevCharCount = today.charCount;
+      const diff = effectiveChars - prevCharCount;
+
+      if (diff > 0) {
+        today.addedCount += diff;
+      } else if (diff < 0) {
+        today.removedCount += -diff;
+      }
+      today.charCount = effectiveChars;
     } else {
-      todayLog.charCount = charCount;
+      // 新規履歴
+      today = {
+        date,
+        addedCount: effectiveChars,
+        removedCount: 0,
+        charCount: effectiveChars
+      };
+      history.push(today);
     }
 
-    this.save();
+    this.historyMap.set(this.activeFilePath, history);
+    this.previousContent = newContent;
+    this.updateWebview();
   }
 
-  private scheduleUpdate() {
-    if (this.updateTimeout) clearTimeout(this.updateTimeout);
-    this.updateTimeout = setTimeout(() => this.updateTodayStats(), this.UPDATE_INTERVAL);
+  private updateWebview() {
+    if (!this.view) return;
+
+    const histories = this.activeFilePath
+      ? this.historyMap.get(this.activeFilePath) || []
+      : [];
+
+    const rows = histories.map(h =>
+      `<tr>
+        <td>${h.date}</td>
+        <td>-${h.removedCount}</td>
+        <td>+${h.addedCount}</td>
+        <td>=${h.charCount}</td>
+      </tr>`).join('');
+
+    this.view.webview.html = `
+      <html>
+        <body style="padding:5px; overflow-x:auto;">
+          <table border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse; table-layout:auto; white-space:nowrap;">
+            <tr>
+              <th style="font-weight:normal;">Date</th>
+              <th style="font-weight:normal;">Del</th>
+              <th style="font-weight:normal;">Add</th>
+              <th style="font-weight:normal;">Rslt</th>
+            </tr>
+            ${rows || '<tr><td colspan="4">履歴なし</td></tr>'}
+          </table>
+        </body>
+      </html>`;
   }
-
-  private updateTodayStats() {
-    if (!this.activeFile) return;
-    const today = new Date().toISOString().split('T')[0];
-    const stats = this.fileStats[this.activeFile];
-    if (!stats) return;
-
-    const text = vscode.window.activeTextEditor?.document.getText() || '';
-    const charCount = countChars(text);
-
-    let todayLog = stats.history.find(h => h.date === today);
-    if (!todayLog) {
-      todayLog = { date: today, addedCount: charCount, removedCount: 0, charCount };
-      stats.history.push(todayLog);
-    } else {
-      // 既存ログは差分を正しく確定後に反映
-      const prevCharCount = todayLog.charCount || 0;
-      todayLog.addedCount = charCount > prevCharCount ? charCount - prevCharCount : 0;
-      todayLog.removedCount = charCount < prevCharCount ? prevCharCount - charCount : 0;
-      todayLog.charCount = charCount;
-    }
-
-    this.save();
-    this.update();
-  }
-
-  private save() {
-    this.context.globalState.update('fileStats', this.fileStats);
-  }
-
-  update() {
-    if (!this._view) return;
-
-    if (!this.activeFile || !this.fileStats[this.activeFile]) {
-      this._view.webview.html = this.getHtml([]);
-      return;
-    }
-
-    const sortedHistory = [...this.fileStats[this.activeFile].history].sort((a, b) => b.date.localeCompare(a.date));
-    this._view.webview.html = this.getHtml(sortedHistory);
-  }
-
-  private getHtml(history: FileHistory[]): string {
-  const listItems = history
-    .map(h => `<li>${h.date} | -: ${h.removedCount} | +: ${h.addedCount} | =: ${h.charCount}</li>`)
-    .join('');
-
-  return `<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <style>
-    html, body {
-      height: 100%;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-      overflow-x: auto; /* 水平スクロール */
-      overflow-y: auto; /* 垂直スクロール */
-      font-family: sans-serif;
-    }
-    ul {
-      padding-left: 0;
-      margin: 0;
-      list-style: none;
-      white-space: nowrap; /* 行が長くても折り返さず水平スクロール */
-    }
-    li {
-      margin: 2px 0;
-    }
-  </style>
-</head>
-<body>
-  <ul>
-    ${listItems || '<li>No data available.</li>'}
-  </ul>
-</body>
-</html>`;
-}
-
 }
