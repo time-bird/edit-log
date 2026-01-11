@@ -1,6 +1,6 @@
 {
   "name": "edit-log",
-  "displayName": "EditLog",
+  "displayName": "EDIT LOG",
   "description": "Track character additions and removals per day.",
   "version": "0.0.1",
   "engines": {
@@ -17,7 +17,7 @@
         {
           "type": "webview",
           "id": "edit-log",
-          "name": "EditLog"
+          "name": "EDIT LOG"
         }
       ]
     },

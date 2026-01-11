@@ -147,9 +147,9 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
               <th style="font-weight:normal;">Date</th>
               <th style="font-weight:normal;">Del</th>
               <th style="font-weight:normal;">Add</th>
-              <th style="font-weight:normal;">Rslt</th>
+              <th style="font-weight:normal;">Total</th>
             </tr>
-            ${rows || '<tr><td colspan="4">履歴なし</td></tr>'}
+            ${rows || '<tr><td colspan="4">No history available</td></tr>'}
           </table>
         </body>
       </html>`;
