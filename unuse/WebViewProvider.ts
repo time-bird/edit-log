@@ -1,123 +1,134 @@
 import * as vscode from 'vscode';
-
-// 1日分の編集履歴
-export interface FileHistory {
-  date: string;        // YY-MM-DD
-  addedCount: number;  // 追加文字数
-  removedCount: number;// 削除文字数
-  charCount: number;   // その日の最終文字数
-}
+import * as path from 'path';
+import { countCharactersRecursive } from './utils/countCharactersRecursive';
+import { CharacterCounter } from './utils/characterCounter';
 
 export class WebViewProvider implements vscode.WebviewViewProvider {
-  private view?: vscode.WebviewView;
-  private activeFilePath?: string;
-  private previousContent: string = '';
-  private historyMap: Map<string, FileHistory[]> = new Map();
+    private view?: vscode.WebviewView;
+    private activeFilePath?: string;
+    private activeFolderPath?: string;
+    private folderTotal: number = 0;
+    private lastFileCharCount: number = 0;
 
-  constructor(private context: vscode.ExtensionContext) {
-    // ドキュメント保存時のフック
-    vscode.workspace.onDidSaveTextDocument(doc => {
-      if (doc.uri.fsPath === this.activeFilePath) {
-        this.handleEdit(doc.getText());
-      }
-    });
-  }
-
-  // WebView初期化
-  resolveWebviewView(webviewView: vscode.WebviewView) {
-    this.view = webviewView;
-    webviewView.webview.options = { enableScripts: true };
-    this.updateWebview();
-  }
-
-  // 空白・改行・タブを除外して有効文字をカウント（Intl.Segmenterを使用し、日本語文字に対応）
-  private segmenter = new Intl.Segmenter('ja', { granularity: 'grapheme' });
-
-  private countEffectiveChars(text: string): number {
-    const segments = [...this.segmenter.segment(text)];
-    return segments.filter(seg => !/[\s\t\n\r]/.test(seg.segment)).length;
-  }
-
-  // アクティブファイル変更時
-  public setActiveFile(filePath: string) {
-    this.activeFilePath = filePath;
-    const doc = vscode.workspace.textDocuments.find(d => d.uri.fsPath === filePath);
-    this.previousContent = doc ? doc.getText() : '';
-    this.updateWebview();
-  }
-
-  // 編集確定時（保存時）
-  private handleEdit(newContent: string) {
-    const date = new Date().toLocaleDateString('ja-JP', {
-      year: '2-digit',
-      month: '2-digit',
-      day: '2-digit'
-    }).replace(/\//g, '-');
-
-    const prev = this.previousContent;
-    const prevCount = this.countEffectiveChars(prev);
-    const newCount = this.countEffectiveChars(newContent);
-
-    // 差分
-    let added = 0;
-    let removed = 0;
-
-    // 差分を判定
-    const maxLen = Math.max(prev.length, newContent.length);
-    for (let i = 0; i < maxLen; i++) {
-      const oldChar = prev[i];
-      const newChar = newContent[i];
-      if (oldChar !== newChar) {
-        if (newChar && !/[\s\t\n\r]/.test(newChar)) added++;
-        if (oldChar && !/[\s\t\n\r]/.test(oldChar)) removed++;
-      }
+    constructor(private context: vscode.ExtensionContext) {
+        // 保存時の処理
+        vscode.workspace.onDidSaveTextDocument(async (doc) => {
+            if (this.activeFilePath === doc.uri.fsPath) {
+                await this.refreshAllStats(doc.getText());
+            }
+        });
     }
 
-    // 結果更新
-    const history = this.historyMap.get(this.activeFilePath || '') || [];
-    const existing = history.find(h => h.date === date);
-    if (existing) {
-      existing.addedCount += added;
-      existing.removedCount += removed;
-      existing.charCount = newCount;
-    } else {
-      history.push({
-        date,
-        addedCount: added,
-        removedCount: removed,
-        charCount: newCount
-      });
+    // ファイルが選択された時に呼ばれる
+    public async updateTarget(filePath: string) {
+        this.activeFilePath = filePath;
+        this.activeFolderPath = path.dirname(filePath);
+
+        // フォルダ合計の計算
+        this.folderTotal = await countCharactersRecursive(vscode.Uri.file(this.activeFolderPath));
+
+        // ファイル個別の現在値を取得
+        const doc = vscode.workspace.textDocuments.find(d => d.uri.fsPath === filePath);
+        const currentContent = doc ? doc.getText() : (await vscode.workspace.fs.readFile(vscode.Uri.file(filePath))).toString();
+        const currentCount = CharacterCounter.count(currentContent);
+        
+        this.lastFileCharCount = currentCount;
+
+        // 初回ロード時、履歴に今日のエントリがなければ作成（差分0）
+        this.saveFileHistory(filePath, currentCount, 0);
+        this.updateWebview();
     }
-    this.historyMap.set(this.activeFilePath || '', history);
-    this.previousContent = newContent;
-    this.updateWebview();
-  }
 
-  // WebView更新
-  private updateWebview() {
-    if (!this.view) return;
+    private async refreshAllStats(newContent: string) {
+        if (!this.activeFilePath || !this.activeFolderPath) return;
 
-    const histories = this.activeFilePath
-      ? this.historyMap.get(this.activeFilePath) || []
-      : [];
+        // 1. フォルダ合計を再計算
+        this.folderTotal = await countCharactersRecursive(vscode.Uri.file(this.activeFolderPath));
 
-    const rows = histories.map(h =>
-      `<tr>
-        <td>${h.date}</td>
-        <td>-${h.removedCount}</td>
-        <td>+${h.addedCount}</td>
-        <td>=${h.charCount}</td>
-      </tr>`
-    ).join('');
+        // 2. ファイル個別の差分を計算
+        const currentCount = CharacterCounter.count(newContent);
+        const diff = currentCount - this.lastFileCharCount;
 
-    this.view.webview.html = `
-      <html>
-        <body style="padding: 5px;">
-          <table border="1" cellspacing="0" cellpadding="2">
-            <tr><th>Date</th><th>Del</th><th>Add</th><th>Rslt</th></tr>
-            ${rows || '<tr><td colspan="4">履歴なし</td></tr>'}
-          </table>
-        </body>
-      </html>`;
-  }
+        if (diff !== 0) {
+            this.saveFileHistory(this.activeFilePath, currentCount, diff);
+            this.lastFileCharCount = currentCount;
+        }
+        this.updateWebview();
+    }
+
+    // 履歴の保存 (VS Codeのワークスペース領域に保存)
+    private saveFileHistory(filePath: string, total: number, diff: number) {
+        const date = new Date().toLocaleDateString();
+        // ワークスペースごとの保存領域から取得
+        let allHistory = this.context.workspaceState.get<{[key: string]: any[]}>('fileHistories', {});
+        let history = allHistory[filePath] || [];
+
+        let today = history.find(h => h.date === date);
+        if (today) {
+            if (diff > 0) today.addedCount += diff;
+            else if (diff < 0) today.removedCount += Math.abs(diff);
+            today.charCount = total;
+        } else if (diff !== 0 || history.length === 0) {
+            history.push({
+                date,
+                addedCount: diff > 0 ? diff : 0,
+                removedCount: diff < 0 ? Math.abs(diff) : 0,
+                charCount: total
+            });
+        }
+
+        allHistory[filePath] = history;
+        this.context.workspaceState.update('fileHistories', allHistory);
+    }
+
+    public resolveWebviewView(webviewView: vscode.WebviewView) {
+        this.view = webviewView;
+        webviewView.webview.options = { enableScripts: true };
+        this.updateWebview();
+    }
+
+    private updateWebview() {
+        if (!this.view) return;
+
+        const fileName = this.activeFilePath ? path.basename(this.activeFilePath) : '-';
+        const folderName = this.activeFolderPath ? path.basename(this.activeFolderPath) : '-';
+        const todayStr = new Date().toLocaleDateString();
+
+        // ファイル履歴の取得
+        const allHistory = this.context.workspaceState.get<{[key: string]: any[]}>('fileHistories', {});
+        const history = this.activeFilePath ? allHistory[this.activeFilePath] || [] : [];
+
+        const fileRows = [...history].reverse().map(h => `
+            <tr>
+                <td>${h.date}</td>
+                <td style="color: #ff8888;">-${h.removedCount}</td>
+                <td style="color: #88ff88;">+${h.addedCount}</td>
+                <td style="font-weight: bold;">${h.charCount}</td>
+            </tr>
+        `).join('');
+
+        this.view.webview.html = `
+            <!DOCTYPE html>
+            <html>
+            <body style="font-family: sans-serif; padding: 10px; font-size: 0.9em;">
+                <div style="margin-bottom: 5px; opacity: 0.7;">Folder Total: ${folderName}</div>
+                <table style="width: 100%; border-bottom: 1px solid #555; padding-bottom: 10px; margin-bottom: 10px;">
+                    <tr style="font-weight: bold;">
+                        <td style="width: 40%;">${todayStr}</td>
+                        <td style="text-align: right;">Total: ${this.folderTotal.toLocaleString()}</td>
+                    </tr>
+                </table>
+
+                <hr style="border: 0; border-top: 1px solid #888; margin: 15px 0;">
+
+                <div style="margin-bottom: 5px; opacity: 0.7;">File History: ${fileName}</div>
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <tr style="opacity: 0.6; font-size: 0.8em; border-bottom: 1px solid #444;">
+                        <th>Date</th><th>Del</th><th>Add</th><th>Total</th>
+                    </tr>
+                    ${fileRows}
+                </table>
+            </body>
+            </html>`;
+    }
 }

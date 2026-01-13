@@ -7,9 +7,7 @@
     "vscode": "^1.104.0"
   },
   "categories": ["Other"],
-  "activationEvents": [
-    "onView:edit-log"
-  ],
+  "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "views": {
@@ -17,16 +15,11 @@
         {
           "type": "webview",
           "id": "edit-log",
-          "name": "EDIT LOG"
+          "name": "EDIT LOG",
+          "icon": ""
         }
       ]
-    },
-    "commands": [
-      {
-        "command": "edit-log.refresh",
-        "title": "Refresh Edit Log"
-      }
-    ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
