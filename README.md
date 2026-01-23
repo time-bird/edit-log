@@ -3,12 +3,12 @@
 <img src="images/editlog_image01.png" width="200" alt="Darktheme">
 <img src="images/editlog_image02.png" width="200" alt="Lighttheme">
 
-Visualize your writing progress directly within VS Code.
-This extension tracks not only the character count of your active file but also the total volume of your project folder, including daily logs of additions and deletions.
+When you activate a file in the Explorer, it displays the editing history for that file for the current day, including characters deleted, characters added, and the final character count. As long as the file name and its location remain unchanged, the editing history is recorded daily and displayed in a clear list. At the top of the view, you can see the name of the folder the file belongs to, along with the total character count of all files within that folder.
 
 ## Key Features
 
 - **Real-time Character Counting**: Accurately counts characters in the active document, excluding whitespace and newlines.
+- **Multibyte Character Support**: Fully supports multibyte characters, such as Japanese (tested and verified), ensuring accurate tracking for global writers.
 - **Folder Statistics**: View the combined character count for all files within the current folder.
 - **Customizable Aggregation**: Toggle specific files on or off via a checklist to include or exclude them from the folder total. These settings are saved per workspace.
 - **Daily Edit History**: A detailed table showing how much you've added or deleted each day, along with the total count.
@@ -42,3 +42,6 @@ To ensure accuracy for Japanese and global users, this extension uses `Intl.Segm
 - Added recursive folder character counting.
 - Added file exclusion settings (persistent).
 - Added daily edit history (Add/Del) tracking.
+
+### 0.0.2
+- Refined README.md
