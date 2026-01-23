@@ -1,10 +1,16 @@
 {
   "name": "edit-log",
   "displayName": "EDIT LOG",
+  "publisher": "time-bird",
   "description": "Track character additions and removals per day.",
   "version": "0.0.1",
+  "icon": "images/editlog_icon.png",
   "engines": {
     "vscode": "^1.104.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/time-bird/edit-log"
   },
   "categories": [
     "Other"
@@ -18,7 +24,7 @@
           "type": "webview",
           "id": "edit-log",
           "name": "EDIT LOG",
-          "icon": ""
+          "icon": "$(graph-line)"
         }
       ]
     }
