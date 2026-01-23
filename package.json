@@ -3,7 +3,7 @@
   "displayName": "EDIT LOG",
   "publisher": "time-bird",
   "description": "Track character additions and removals per day.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "icon": "images/editlog_icon.png",
   "engines": {
     "vscode": "^1.104.0"

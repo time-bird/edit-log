@@ -45,3 +45,6 @@ To ensure accuracy for Japanese and global users, this extension uses `Intl.Segm
 
 ### 0.0.2
 - Refined README.md
+
+### 0.0.3
+- Refined App Icon
