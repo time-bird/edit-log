@@ -17,16 +17,15 @@ When you activate a file in the Explorer, it displays the editing history for th
 ## How to Use
 
 1. The **EDIT LOG** view is integrated into the **Explorer** side bar (the folder icon). If you cannot find it, right-click anywhere in the Explorer side bar and ensure **EDIT LOG** is checked to make it visible.
-2. Click the **EDIT LOG** title in the side bar to expand the view.
-3. Open any text file to see its individual character count and the folder's total volume.
+1. Click the **EDIT LOG** title in the side bar to expand the view.
+1. Open any text file to see its individual character count and the folder's total volume.
+1. Click the **Checklist Icon** next to the folder name to select which files should be included in the total. This allows you to exclude specific files or logs from your project's aggregate count.
+1. You can toggle all files on or off at once using the **"Toggle All Files"** checkbox.
+1. Your writing progress is automatically recorded every time you save a file.
 
-<img src="images/EditLogDemo01.gif" width="600" alt="Demo1">
+<img src="images/EditLogDemo01.gif" width="610" alt="Demo1">
 
-4. Click the **Checklist Icon** next to the folder name to select which files should be included in the total. This allows you to exclude specific files or logs from your project's aggregate count.
-
-<img src="images/EditLogDemo02.gif" width="600" alt="Demo2">
-
-5. Your writing progress is automatically recorded every time you save a file.
+<img src="images/EditLogDemo02.gif" width="380" alt="Demo2">
 
 
 ## Counting Logic
