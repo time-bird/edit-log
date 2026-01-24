@@ -7,6 +7,8 @@ All notable changes to the "EDIT LOG" extension will be documented in this file.
 ### Added
 - Added "Toggle All Files" option to the folder file selection list.
 
+## [0.1.3] - 2026-01-24
+
 ### Fixed
 - Fine-tuned text colors and font weights for better theme compatibility.
 - Fixed a bug where the folder file list would unexpectedly close upon selection.
