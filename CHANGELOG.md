@@ -2,7 +2,7 @@
 
 All notable changes to the "EDIT LOG" extension will be documented in this file.
 
-## [0.1.3] - 2026-01-24
+## [0.2.0] - 2026-01-24
 
 ### Added
 - Added "Toggle All Files" option to the folder file selection list.

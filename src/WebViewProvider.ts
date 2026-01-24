@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { getFolderStats, FileStat } from './utils/countCharactersRecursive'; // 名前変更に合わせてインポート修正
+import { getFolderStats, FileStat } from './utils/countCharactersRecursive';
 import { CharacterCounter } from './utils/characterCounter';
 
 export class WebViewProvider implements vscode.WebviewViewProvider {
@@ -115,7 +115,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 	}
 
 	private saveFileHistory(filePath: string, total: number, diff: number) {
-		// (変更なしのため省略。元のコードと同じ)
+		// 変更履歴の保存
 		const date = new Date().toLocaleDateString();
 		let allHistory = this.context.workspaceState.get<{[key: string]: any[]}>('fileHistories', {});
 		let history = allHistory[filePath] || [];
@@ -156,12 +156,12 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 					this.toggleExclusion(message.path);
 					return;
 				case 'toggleFolderList':
-					// ★バックエンドの状態を更新して再描画
+					// バックエンドの状態を更新して再描画
 					this.isFolderListVisible = !this.isFolderListVisible;
 					this.updateWebview();
 					return;
 				case 'toggleAll':
-					// ★一括操作のメッセージハンドラ
+					// 一括操作のメッセージハンドラ
 					await this.toggleAllExclusions(message.checkAll);
 					return;
 			}
@@ -399,7 +399,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 						vscode.postMessage({ command: 'toggleExclusion', path: path });
 					}
 
-					// ★追加: 一括操作の通知
+					// 一括操作の通知
 					function toggleAll(isChecked) {
 						vscode.postMessage({ command: 'toggleAll', checkAll: isChecked });
 					}

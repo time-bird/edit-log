@@ -1,7 +1,7 @@
-# EDIT LOG
-
 <img src="images/editlog_image01.png" width="200" alt="Darktheme">
 <img src="images/editlog_image02.png" width="200" alt="Lighttheme">
+
+# Edit Log
 
 When you activate a file in the Explorer, it displays the editing history for that file for the current day, including characters deleted, characters added, and the final character count. As long as the file name and its location remain unchanged, the editing history is recorded daily and displayed in a clear list. At the top of the view, you can see the name of the folder the file belongs to, along with the total character count of all files within that folder.
 
