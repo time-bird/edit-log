@@ -2,6 +2,13 @@
 
 All notable changes to the "EDIT LOG" extension will be documented in this file.
 
+## [0.2.2] - 2026-01-27
+
+### Fixed
+- Updated scrollbar styling for better visibility on hover and click.
+- Adjusted sticky header background color to improve readability.
+- Refined container width to align with other UI elements.
+
 ## [0.2.1] - 2026-01-24
 
 ### Fixed

@@ -231,7 +231,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 					<span class="chk-name-label" title="${f.relativePath}">
 						${f.relativePath}
 					</span>
-					<span style="opacity: 0.7; font-size: 0.9em; flex-shrink: 0; margin-left: 5px;">
+					<span style="opacity: 0.7; font-size: 0.9em; flex-shrink: 0; margin-left: 3px;">
 						${f.count.toLocaleString()}
 					</span>
 				</label>
@@ -240,7 +240,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 		}).join('');
 
 		// 本体WebViewの設定
-		this.view.webview.html = `
+		this.view.webview.html = /*html*/ `
 			<!DOCTYPE html>
 			<html>
 			<head>
@@ -249,9 +249,27 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 				
 				<link href="${codiconsUri}" rel="stylesheet" />
 				<style>
-				html { scrollbar-color: unset !important; scrollbar-width: auto !important; }
+				html {
+					scrollbar-color: unset !important;
+					scrollbar-width: auto !important;
+					}
+				/* スクロールバー設定 */
+				::-webkit-scrollbar-track { background: transparent !important; }
+				::-webkit-scrollbar-thumb { 
+					background-color: transparent;
+					background-clip: content-box; 
+					}
+				::-webkit-scrollbar-thumb:hover { 
+					background-color: var(--vscode-scrollbarSlider-hoverBackground) !important; 
+					}
+				::-webkit-scrollbar-thumb:active {
+					background-color: var(--vscode-scrollbarSlider-activeBackground) !important;
+					}
+				::-webkit-scrollbar-corner { background-color: transparent; }
+
 				body { 
-					padding: 10px; 
+					margin: 0;
+					padding: 10px;
 					font-family: var(--vscode-font-family); 
 					font-size: var(--vscode-font-size);
 					font-weight: normal; 
@@ -308,7 +326,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 				/* 一括操作行のStickyスタイル: 背景色を少し変える */
 				.sticky-header {
 					position: sticky; top: 0; z-index: 10;
-					background-color: var(--vscode-editor-inactiveSelectionBackground);
+					background-color: var(--vscode-editorWidget-background);
 					padding: 4px 5px;
 					border-bottom: 1px solid var(--vscode-panel-border);
 				}
