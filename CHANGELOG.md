@@ -2,6 +2,11 @@
 
 All notable changes to the "EDIT LOG" extension will be documented in this file.
 
+## [0.2.3] - 2026-01-27
+
+### Fixed
+- Standardized date format from local to ISO (yyyy-MM-dd).
+
 ## [0.2.2] - 2026-01-27
 
 ### Fixed

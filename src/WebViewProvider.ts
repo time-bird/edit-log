@@ -116,7 +116,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 
 	private saveFileHistory(filePath: string, total: number, diff: number) {
 		// 変更履歴の保存
-		const date = new Date().toLocaleDateString();
+		const date = new Date().toISOString().split('T')[0];	//ISO日付形式
 		let allHistory = this.context.workspaceState.get<{[key: string]: any[]}>('fileHistories', {});
 		let history = allHistory[filePath] || [];
 		let today = history.find(h => h.date === date);
@@ -252,6 +252,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 				html {
 					scrollbar-color: unset !important;
 					scrollbar-width: auto !important;
+					overflow: auto;
 					}
 				/* スクロールバー設定 */
 				::-webkit-scrollbar-track { background: transparent !important; }
@@ -391,7 +392,8 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 				<table>
 					<tr>
 						<td class="total-row" style="font-weight: bold; text-align: right;">
-							Total : ${this.folderTotal.toLocaleString()}
+							<span style="color: var(--vscode-descriptionForeground)">Total :</span> 
+							${this.folderTotal.toLocaleString()}
 						</td>
 					</tr>
 				</table>
