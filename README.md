@@ -24,7 +24,7 @@ When you activate a file in the Explorer, it displays the editing history for th
 1. Your writing progress is automatically recorded every time you save a file.
 
 <img src="images/EditLogDemo01.gif" width="610" alt="Demo1">
-<br>
+&nbsp;
 <img src="images/EditLogDemo02.gif" width="610" alt="Demo2">
 
 
