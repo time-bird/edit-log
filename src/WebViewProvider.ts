@@ -209,7 +209,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 		const history = this.activeFilePath ? allHistory[this.activeFilePath] || [] : [];
 		const fileRows = [...history].reverse().map(h => `
 			<tr>
-				<td style="color: var(--vscode-sideBar-foreground); padding-right: 4px;">
+				<td style="color: var(--vscode-sideBar-foreground); font-size: 0.9em; padding-right: 4px;">
 				${h.date}</td>
 				<td style="color: var(--vscode-charts-red); text-align: right; padding-right: 4px;">
 				-${h.removedCount.toLocaleString()}</td>
@@ -362,7 +362,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 
 				tr { border-bottom: 1px solid var(--vscode-panel-border); }
 				th { color: var(--vscode-descriptionForeground); font-size: 0.8em; text-align: left; font-weight: bold; }
-				td { padding: 3px 0; }
+				td { padding: 3px 0; white-space: nowrap; }
 				</style>
 			</head>
 			

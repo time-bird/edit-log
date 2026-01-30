@@ -2,6 +2,11 @@
 
 All notable changes to the "EDIT LOG" extension will be documented in this file.
 
+## [0.2.4] - 2026-01-30
+
+### Fixed
+- Improve overall visibility by preventing text wrapping across all tables and slightly reducing the date font size.
+
 ## [0.2.3] - 2026-01-27
 
 ### Fixed
