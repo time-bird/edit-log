@@ -2,6 +2,11 @@
 
 All notable changes to the "EDIT LOG" extension will be documented in this file.
 
+## [0.2.5] - 2026-02-30
+
+### Fixed
+- Refined README.md
+
 ## [0.2.4] - 2026-01-30
 
 ### Fixed
