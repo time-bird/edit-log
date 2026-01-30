@@ -2,6 +2,12 @@
 
 All notable changes to the "EDIT LOG" extension will be documented in this file.
 
+## [0.2.6] - 2026-02-30
+
+### Fixed
+- Updated folder and file name labels to icons.
+- Updated images in README.md accordingly.
+
 ## [0.2.5] - 2026-02-30
 
 ### Fixed

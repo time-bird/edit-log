@@ -369,7 +369,8 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 			<body>
 				<div class="header-row">
 					<div class="name-label" title="${path.basename(this.activeFolderPath || '')}">
-						Folder : ${path.basename(this.activeFolderPath || '')}
+						<i class="codicon codicon-folder" style="color: var(--vscode-descriptionForeground); vertical-align: middle; padding-right: 2px;"></i>
+						${path.basename(this.activeFolderPath || '')}
 					</div>
 					<button class="check-btn" onclick="toggleFolderList()">
 						<i class="codicon codicon-checklist"></i>
@@ -398,8 +399,9 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 					</tr>
 				</table>
 
-				<div class="name-label" title="${fileName}" style="padding-bottom: 5px;">
-					File : ${fileName}
+				<div class="name-label" title="${fileName}" style="padding-bottom: 6px;">
+					<i class="codicon codicon-file-text" style="color: var(--vscode-descriptionForeground); vertical-align: middle; padding-right: 2px;"></i>
+					${fileName}
 				</div>
 				<table>
 					<tr><th>Date</th><th>Del</th><th>Add</th><th>Total</th></tr>
