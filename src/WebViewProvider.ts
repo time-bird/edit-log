@@ -385,7 +385,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 						</label>
 					</div>
 					<div class="select-list-header">
-						Select Files Individually :
+						Include :
 					</div>
 					${checkListRows}
 				</div>
