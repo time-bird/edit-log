@@ -281,7 +281,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 					display: flex; 
 					justify-content: space-between; 
 					align-items: center; 
-					margin-bottom: 3px; 
+					margin-bottom: 2px; 
 					gap: 5px;
 				}
 				
@@ -308,7 +308,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 				.check-btn {
 					flex-shrink: 0; background: none; border: none; 
 					color: var(--vscode-icon-foreground);
-					cursor: pointer; display: flex; align-items: center; padding: 2px 0;
+					cursor: pointer; display: flex; align-items: center; padding: 0px 0;
 				}
 				.check-btn:hover { color: var(--vscode-sideBar-foreground); }
 				
@@ -393,7 +393,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 				<table>
 					<tr>
 						<td class="total-row" style="font-weight: bold; text-align: right;">
-							<span style="color: var(--vscode-descriptionForeground)">Total :</span> 
+							<span style="color: var(--vscode-descriptionForeground); font-size: 0.8em;">Total :</span> 
 							${this.folderTotal.toLocaleString()}
 						</td>
 					</tr>

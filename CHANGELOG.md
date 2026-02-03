@@ -2,6 +2,11 @@
 
 All notable changes to the "EDIT LOG" extension will be documented in this file.
 
+## [0.2.8] - 2026-02-03
+
+### Fixed
+- Tweaked folder character count label display.
+
 ## [0.2.7] - 2026-02-01
 
 ### Fixed
