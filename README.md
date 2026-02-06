@@ -3,7 +3,7 @@
 
 # Edit Log
 
-When you activate a file in the Explorer, it displays the editing history for that file for the current day, including characters deleted, characters added, and the final character count. As long as the file name and its location remain unchanged, the editing history is recorded daily and displayed in a clear list. At the top of the view, you can see the name of the folder the file belongs to, along with the total character count of all files within that folder.
+When you activate a file in the Explorer, it displays the editing history for that file for the current day, including characters deleted, characters added, and the final character count. As long as the file name and its location remain unchanged, the editing history is recorded daily and displayed in a clear list. At the top of the view, you can see the name of the folder the file belongs to, along with the total character count of all files within that folder. The export and import features also ensure history is preserved even if files are renamed or moved.
 
 ## Key Features
 
@@ -29,10 +29,16 @@ When you activate a file in the Explorer, it displays the editing history for th
     - Open the new/renamed file.
     - Import the CSV. A warning will appear stating the path mismatch—select **"Yes, Import Anyway"** to restore and link the history to the new file path.
 
+### Record of text edits within files
 <img src="images/EditLogDemo01.gif" width="600" alt="Demo1">
 &nbsp;
-<img src="images/EditLogDemo02.gif" width="600" alt="Demo2">
 
+### File selection for total character count
+<img src="images/EditLogDemo02.gif" width="600" alt="Demo2">
+&nbsp;
+
+### Export and Import file edit history
+<img src="images\editlog_image03.png" width="450" alt="Export menu & Import menu in Submenu">
 
 ## Counting Logic
 To ensure accuracy for Japanese and global users, this extension uses `Intl.Segmenter` to correctly count surrogate pairs (such as emojis) as a single character. For a focused writing experience, the following are excluded from the count:
