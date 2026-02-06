@@ -38,7 +38,7 @@ When you activate a file in the Explorer, it displays the editing history for th
 &nbsp;
 
 ### Export and Import file edit history
-<img src="images\editlog_image03.png" width="450" alt="Export menu & Import menu in Submenu">
+<img src="images/editlog_image03.png" width="450" alt="Export menu & Import menu in Submenu">
 
 ## Counting Logic
 To ensure accuracy for Japanese and global users, this extension uses `Intl.Segmenter` to correctly count surrogate pairs (such as emojis) as a single character. For a focused writing experience, the following are excluded from the count:
