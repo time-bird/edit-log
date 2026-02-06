@@ -28,7 +28,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 		});
 	}
 
-	/*** 実体処理 ***/
+	/*** ターゲットファイルの切り替え ***/
 	public async updateTarget(filePath: string) {
 		this.activeFilePath = filePath;
 		this.activeFolderPath = path.dirname(filePath);
@@ -46,13 +46,14 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 		this.updateWebview();
 	}
 
-	// フォルダの統計のみ再計算（他のファイル保存時やチェックボックス変更時）
+	/*** フォルダの統計のみ更新（他のファイル保存時やチェックボックス変更時） ***/
 	private async refreshFolderStatsOnly() {
 		if (!this.activeFolderPath) return;
 		await this.calculateFolderStats();
 		this.updateWebview();
 	}
 
+	/*** 全統計データの完全更新 ***/
 	private async refreshAllStats(newContent: string) {
 		if (!this.activeFilePath || !this.activeFolderPath) return;
 
@@ -70,7 +71,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 		this.updateWebview();
 	}
 
-	/*** フォルダ内ファイル文字数合計：フォルダ内のファイルをスキャンし、除外設定を加味して合計を出す ***/
+	/*** フォルダ全体の文字数集計 ***/
 	private async calculateFolderStats() {
 		if (!this.activeFolderPath) return;
 		
@@ -117,7 +118,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 		await this.refreshFolderStatsOnly();
 	}
 
-	/*** 変更履歴の保存 ***/
+	/*** 日次編集履歴の保存・更新 ***/
 	private saveFileHistory(filePath: string, total: number, diff: number) {
 		const date = new Date().toISOString().split('T')[0];	//ISO日付形式
 		let allHistory = this.context.workspaceState.get<{[key: string]: any[]}>('fileHistories', {});
@@ -127,7 +128,9 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 			if (diff > 0) today.addedCount += diff;
 			else if (diff < 0) today.removedCount += Math.abs(diff);
 			today.charCount = total;
-		} else if (diff !== 0 || history.length === 0) {
+		} 
+		// 今日のレコードがなく、かつ差分がある場合のみ新規作成
+		else if (diff !== 0) {
 			history.push({
 				date,
 				addedCount: diff > 0 ? diff : 0,
@@ -183,6 +186,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 		}
 	}
 
+	/*** Webviewの初期化とイベント登録 ***/
 	public resolveWebviewView(webviewView: vscode.WebviewView) {
     this.view = webviewView;
 
@@ -231,7 +235,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 		await this.refreshFolderStatsOnly();
 	}
 
-	/***** 画面表示本体 *****/
+	/*** Webview画面の描画更新 ***/
 	private updateWebview() {
 		if (!this.view) return;
 

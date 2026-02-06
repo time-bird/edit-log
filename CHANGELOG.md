@@ -2,9 +2,14 @@
 
 All notable changes to the "EDIT LOG" extension will be documented in this file.
 
+## [0.3.2] - 2026-02-06
+
+### Refined
+- RHistory recording logic to only create logs when actual changes (additions/removals) occur.
+
 ## [0.3.1] - 2026-02-06
 
-### Fixed
+### Refined
 - Refined README.md
 
 ## [0.3.0] - 2026-02-06
@@ -15,45 +20,45 @@ All notable changes to the "EDIT LOG" extension will be documented in this file.
 
 ## [0.2.8] - 2026-02-03
 
-### Fixed
+### Refined
 - Tweaked folder character count label display.
 
 ## [0.2.7] - 2026-02-01
 
-### Fixed
+### Refined
 - Refined header.
 
 ## [0.2.6] - 2026-01-30
 
-### Fixed
+### Refined
 - Updated folder and file name labels to icons.
 - Updated images in README.md accordingly.
 
 ## [0.2.5] - 2026-01-30
 
-### Fixed
+### Refined
 - Refined README.md
 
 ## [0.2.4] - 2026-01-30
 
-### Fixed
+### Refined
 - Improve overall visibility by preventing text wrapping across all tables and slightly reducing the date font size.
 
 ## [0.2.3] - 2026-01-27
 
-### Fixed
+### Refined
 - Standardized date format from local to ISO (yyyy-MM-dd).
 
 ## [0.2.2] - 2026-01-27
 
-### Fixed
+### Refined
 - Updated scrollbar styling for better visibility on hover and click.
 - Adjusted sticky header background color to improve readability.
 - Refined container width to align with other UI elements.
 
 ## [0.2.1] - 2026-01-24
 
-### Fixed
+### Refined
 - Refined README.md
 
 ## [0.2.0] - 2026-01-24
@@ -63,18 +68,20 @@ All notable changes to the "EDIT LOG" extension will be documented in this file.
 
 ## [0.1.3] - 2026-01-24
 
-### Fixed
+### Refined
 - Fine-tuned text colors and font weights for better theme compatibility.
+
+### Fixed
 - Fixed a bug where the folder file list would unexpectedly close upon selection.
 
 ## [0.0.3] - 2026-01-23
 
-### Fixed
+### Refined
 - Refined App Icon
 
 ## [0.0.2] - 2026-01-23
 
-### Fixed
+### Refined
 - Refined README.md
 
 ## [0.0.1] - 2026-01-23 (Initial Release)
