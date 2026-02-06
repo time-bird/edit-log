@@ -5,7 +5,7 @@ All notable changes to the "EDIT LOG" extension will be documented in this file.
 ## [0.3.2] - 2026-02-06
 
 ### Refined
-- RHistory recording logic to only create logs when actual changes (additions/removals) occur.
+- History recording logic to only create logs when actual changes (additions/removals) occur.
 
 ## [0.3.1] - 2026-02-06
 
