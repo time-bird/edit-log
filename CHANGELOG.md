@@ -2,6 +2,12 @@
 
 All notable changes to the "EDIT LOG" extension will be documented in this file.
 
+## [0.3.0] - 2026-02-06
+
+### Added
+- Export/Import File History (CSV) with data validation to ensure secure history migration.
+- Submenu in the view title bar for improved accessibility to history commands.
+
 ## [0.2.8] - 2026-02-03
 
 ### Fixed

@@ -3,7 +3,7 @@
   "displayName": "Edit Log",
   "publisher": "time-bird",
   "description": "Track character additions and removals per day.",
-  "version": "0.2.8",
+  "version": "0.3.0",
   "icon": "images/editlog_icon.png",
   "engines": {
     "vscode": "^1.104.0"
@@ -33,6 +33,40 @@
           "name": "EDIT LOG",
           "icon": "$(graph-line)",
           "visibility": "visible"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "edit-log.exportCSV",
+        "title": "Export File History"
+      },
+      {
+        "command": "edit-log.importCSV",
+        "title": "Import File History"
+      }
+    ],
+    "submenus": [
+      {
+        "id": "edit-log.submenu",
+        "label": "History Options",
+        "icon": "$(ellipsis)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "submenu": "edit-log.submenu",
+          "when": "view == edit-log",
+          "group": "navigation"
+        }
+      ],
+      "edit-log.submenu": [
+        {
+          "command": "edit-log.exportCSV"
+        },
+        {
+          "command": "edit-log.importCSV"
         }
       ]
     }

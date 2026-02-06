@@ -2,8 +2,10 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { getFolderStats, FileStat } from './utils/countCharactersRecursive';
 import { CharacterCounter } from './utils/characterCounter';
+import { HistoryManager, HistoryEntry } from './utils/historyManager';
 
 export class WebViewProvider implements vscode.WebviewViewProvider {
+	// 変数定義
 	private view?: vscode.WebviewView;
 	private activeFilePath?: string;
 	private activeFolderPath?: string;
@@ -26,6 +28,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 		});
 	}
 
+	/*** 実体処理 ***/
 	public async updateTarget(filePath: string) {
 		this.activeFilePath = filePath;
 		this.activeFolderPath = path.dirname(filePath);
@@ -67,7 +70,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 		this.updateWebview();
 	}
 
-	// フォルダ内のファイルをスキャンし、除外設定を加味して合計を出す
+	/*** フォルダ内ファイル文字数合計：フォルダ内のファイルをスキャンし、除外設定を加味して合計を出す ***/
 	private async calculateFolderStats() {
 		if (!this.activeFolderPath) return;
 		
@@ -86,13 +89,13 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 		}, 0);
 	}
 
-	// 除外ファイルの取得 (WorkspaceState)
+	/*** フォルダ内ファイル文字数合計：除外ファイルの取得 (WorkspaceState) ***/
 	private getExcludedFiles(folderPath: string): string[] {
 		const allExclusions = this.context.workspaceState.get<{[key: string]: string[]}>('folderExclusions', {});
 		return allExclusions[folderPath] || [];
 	}
 
-	// 除外ファイルの保存
+	/*** フォルダ内ファイル文字数合計：除外ファイルの保存 ***/
 	private async toggleExclusion(relativePath: string) {
 		if (!this.activeFolderPath) return;
 		
@@ -114,8 +117,8 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 		await this.refreshFolderStatsOnly();
 	}
 
+	/*** 変更履歴の保存 ***/
 	private saveFileHistory(filePath: string, total: number, diff: number) {
-		// 変更履歴の保存
 		const date = new Date().toISOString().split('T')[0];	//ISO日付形式
 		let allHistory = this.context.workspaceState.get<{[key: string]: any[]}>('fileHistories', {});
 		let history = allHistory[filePath] || [];
@@ -134,6 +137,50 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 		}
 		allHistory[filePath] = history;
 		this.context.workspaceState.update('fileHistories', allHistory);
+	}
+
+	/*** 変更履歴：エクスポート ***/
+	public async exportCurrentHistory() {
+			if (!this.activeFilePath) return;
+			const allHistory = this.context.workspaceState.get<{[key: string]: HistoryEntry[]}>('fileHistories', {});
+			const history = allHistory[this.activeFilePath] || [];
+			await HistoryManager.exportToCSV(this.activeFilePath, history);
+	}
+
+	/*** 変更履歴：インポート ***/
+	public async importCurrentHistory() {
+		if (!this.activeFilePath) {
+			vscode.window.showWarningMessage('Please open a file in the editor first.');
+			return;
+		}
+
+		const result = await HistoryManager.importFromCSV();
+		
+		if (result) {
+			// パスの不一致チェック
+			// ※ OSによるパス区切りの違いや大文字小文字を考慮して normalize するのが安全ですが、
+			//   単純な比較でも多くのケースで機能します。
+			if (result.sourcePath !== this.activeFilePath) {
+				const activeName = path.basename(this.activeFilePath);
+				const csvSourceName = path.basename(result.sourcePath);
+				
+				const choice = await vscode.window.showErrorMessage(
+					`File mismatch! The CSV is for "${csvSourceName}", but the current file is "${activeName}". Do you want to proceed anyway?`,
+					'Yes, Import Anyway', 'Cancel'
+				);
+				
+				if (choice !== 'Yes, Import Anyway') {
+					return; // 中断
+				}
+			}
+
+			let allHistory = this.context.workspaceState.get<{[key: string]: HistoryEntry[]}>('fileHistories', {});
+			allHistory[this.activeFilePath] = result.entries; 
+			await this.context.workspaceState.update('fileHistories', allHistory);
+			
+			this.updateWebview();
+			vscode.window.showInformationMessage('History imported successfully.');
+		}
 	}
 
 	public resolveWebviewView(webviewView: vscode.WebviewView) {
@@ -169,7 +216,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 		this.updateWebview();
 	}
 
-	// 選択ファイルリスト一括ON/OFFロジック
+	/*** 選択ファイルリスト一括ON/OFFロジック ***/
 	private async toggleAllExclusions(checkAll: boolean) {
 		if (!this.activeFolderPath) return;
 		const allExclusions = this.context.workspaceState.get<{[key: string]: string[]}>('folderExclusions', {}) || {};
@@ -184,6 +231,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
 		await this.refreshFolderStatsOnly();
 	}
 
+	/***** 画面表示本体 *****/
 	private updateWebview() {
 		if (!this.view) return;
 
