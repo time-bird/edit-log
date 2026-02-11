@@ -2,6 +2,11 @@
 
 All notable changes to the "EDIT LOG" extension will be documented in this file.
 
+## [0.3.3] - 2026-02-11
+
+### Refined
+- Refined App Icon
+
 ## [0.3.2] - 2026-02-06
 
 ### Refined
